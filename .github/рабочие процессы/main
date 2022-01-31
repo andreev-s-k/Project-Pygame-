@@ -12,6 +12,12 @@ exp = 0
 
 max_exp = 10 * knight_lvl
 
+f = open("Card/score.txt", encoding="utf8")
+for i in range(1):
+    max_score = f.readline()
+    print(max_score)
+f.close()
+
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('Card game')
@@ -142,12 +148,40 @@ if __name__ == '__main__':
 
         def update(self):
             global exp, max_exp, knight_lvl
-            if exp >= max_exp:
+            if exp >= max_exp and not game_over:
                 knight_lvl += 1
                 exp -= max_exp
                 max_exp = knight_lvl * 10
                 self.max_health = (knight_lvl * 2) + 8
                 self.health = self.max_health
+                self.cell = (2, 2)
+                self.rect.center = (width // 2.15, height // 1.8)
+                self.health_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x - 30,
+                                        ((self.cell[1]) * board.cell_size_y) + self.player_y - 140)
+                self.weapon_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x + 10,
+                                        ((self.cell[1]) * board.cell_size_y) + self.player_y + 40)
+                self.heart.rect.center = ((width // 2) + 50, (height // 2.1) - 10)
+                board.board = [['1'] * board.width for _ in range(board.height)]
+                board.board[1][1] = 'player'
+                for i2 in all_sprites:
+                    if not isinstance(i2, Player):
+                        i2.rect.center = (-1000, -1000)
+                for i2 in range(len(board.board)):
+                    for j2 in range(len(board.board[i])):
+                        if board.board[i2][j2] != 'player' and board.board[i2][j2] != 'blank':
+                            board.board[i2][j2] = random.choice(['coin', 'potion', 'monster', 'weapon'])
+                        if board.board[i2][j2] == 'coin':
+                            board.board[i2][j2] = Coin((j2, i2))
+                            all_sprites.add(board.board[i2][j2])
+                        if board.board[i2][j2] == 'potion':
+                            board.board[i2][j2] = Potion((j2, i2))
+                            all_sprites.add(board.board[i2][j2])
+                        if board.board[i2][j2] == 'monster':
+                            board.board[i2][j2] = Monster((j2, i2))
+                            all_sprites.add(board.board[i2][j2])
+                        if board.board[i2][j2] == 'weapon':
+                            board.board[i2][j2] = Weapon((j2, i2))
+                            all_sprites.add(board.board[i2][j2])
 
     class Heart(pygame.sprite.Sprite):
         def __init__(self):
@@ -299,6 +333,8 @@ if __name__ == '__main__':
     game_over_text_pos = (width // 5, height // 2)
     score_text = font_1.render(str(money), True, [255, 20, 000])
     score_text_pos = (width - 150, 30)
+    max_score_text = font_1.render('Лучший счет: ' + str(max_score), True, [230, 20, 50])
+    max_score_text_pos = (width // 5 - 30, height // 2 + 120)
     exp_text = font_1.render(str(exp) + '/' + (str(max_exp)), True, [5, 0, 255])
     exp_text_pos = (80, 30)
 
@@ -345,6 +381,11 @@ if __name__ == '__main__':
                             if board.board[i][j] == 'weapon':
                                 board.board[i][j] = Weapon((j, i))
                                 all_sprites.add(board.board[i][j])
+                    knight_lvl = 1
+                    exp = 0
+                    max_exp = knight_lvl * 10
+                    player.max_health = (knight_lvl * 2) + 8
+                    player.health = player.max_health
                     player.health = player.max_health
                     score = 0
                     game_over = False
@@ -504,9 +545,11 @@ if __name__ == '__main__':
         for i in range(len(board.board)):
             for j in range(len(board.board[i])):
                 if board.board[0][j] == 'blank':
-                    board.board[i][j] = random.choice(['coin', 'coin', 'potion', 'monster', 'monster', 'weapon'])
+                    board.board[i][j] = random.choice(['coin', 'coin', 'potion', 'monster', 'monster', 'weapon',
+                                                       'monster'])
                 if i > 0 and board.board[i][j] == 'blank' and board.board[i - 1][j] == 'player':
-                    board.board[i][j] = random.choice(['coin', 'coin', 'potion', 'monster', 'monster', 'weapon'])
+                    board.board[i][j] = random.choice(['coin', 'coin', 'potion', 'monster', 'monster', 'weapon',
+                                                       'monster'])
                 if board.board[i][j] == 'coin':
                     board.board[i][j] = Coin((j, i))
                     all_sprites.add(board.board[i][j])
@@ -565,5 +608,12 @@ if __name__ == '__main__':
             game_over = True
             screen.blit(game_over_text, game_over_text_pos)
             screen.blit(score_text, score_text_pos)
+            screen.blit(max_score_text, max_score_text_pos)
+            if score >= int(max_score):
+                max_score = score
+                max_score_text = font_1.render('Лучший счет: ' + str(max_score), True, [230, 20, 50])
+                f = open("Card/score.txt", 'w')
+                f.write(str(score))
+                f.close()
         pygame.display.flip()
     pygame.quit()
