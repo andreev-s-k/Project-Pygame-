@@ -8,6 +8,8 @@ user32 = ctypes.windll.user32
 
 knight_lvl = 1
 
+lvl_change = True
+
 exp = 0
 
 max_exp = 10 * knight_lvl
@@ -154,34 +156,35 @@ if __name__ == '__main__':
                 max_exp = knight_lvl * 10
                 self.max_health = (knight_lvl * 2) + 8
                 self.health = self.max_health
-                self.cell = (2, 2)
-                self.rect.center = (width // 2.15, height // 1.8)
-                self.health_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x - 30,
-                                        ((self.cell[1]) * board.cell_size_y) + self.player_y - 140)
-                self.weapon_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x + 10,
-                                        ((self.cell[1]) * board.cell_size_y) + self.player_y + 40)
-                self.heart.rect.center = ((width // 2) + 50, (height // 2.1) - 10)
-                board.board = [['1'] * board.width for _ in range(board.height)]
-                board.board[1][1] = 'player'
-                for i2 in all_sprites:
-                    if not isinstance(i2, Player):
-                        i2.rect.center = (-1000, -1000)
-                for i2 in range(len(board.board)):
-                    for j2 in range(len(board.board[i])):
-                        if board.board[i2][j2] != 'player' and board.board[i2][j2] != 'blank':
-                            board.board[i2][j2] = random.choice(['coin', 'potion', 'monster', 'weapon'])
-                        if board.board[i2][j2] == 'coin':
-                            board.board[i2][j2] = Coin((j2, i2))
-                            all_sprites.add(board.board[i2][j2])
-                        if board.board[i2][j2] == 'potion':
-                            board.board[i2][j2] = Potion((j2, i2))
-                            all_sprites.add(board.board[i2][j2])
-                        if board.board[i2][j2] == 'monster':
-                            board.board[i2][j2] = Monster((j2, i2))
-                            all_sprites.add(board.board[i2][j2])
-                        if board.board[i2][j2] == 'weapon':
-                            board.board[i2][j2] = Weapon((j2, i2))
-                            all_sprites.add(board.board[i2][j2])
+                if lvl_change:
+                    self.cell = (2, 2)
+                    self.rect.center = (width // 2.15, height // 1.8)
+                    self.health_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x - 30,
+                                            ((self.cell[1]) * board.cell_size_y) + self.player_y - 140)
+                    self.weapon_text_pos = (((self.cell[0]) * board.cell_size_x) + self.player_x + 10,
+                                            ((self.cell[1]) * board.cell_size_y) + self.player_y + 40)
+                    self.heart.rect.center = ((width // 2) + 50, (height // 2.1) - 10)
+                    board.board = [['1'] * board.width for _ in range(board.height)]
+                    board.board[1][1] = 'player'
+                    for i2 in all_sprites:
+                        if not isinstance(i2, Player):
+                            i2.rect.center = (-1000, -1000)
+                    for i2 in range(len(board.board)):
+                        for j2 in range(len(board.board[i])):
+                            if board.board[i2][j2] != 'player' and board.board[i2][j2] != 'blank':
+                                board.board[i2][j2] = random.choice(['coin', 'potion', 'monster', 'weapon'])
+                            if board.board[i2][j2] == 'coin':
+                                board.board[i2][j2] = Coin((j2, i2))
+                                all_sprites.add(board.board[i2][j2])
+                            if board.board[i2][j2] == 'potion':
+                                board.board[i2][j2] = Potion((j2, i2))
+                                all_sprites.add(board.board[i2][j2])
+                            if board.board[i2][j2] == 'monster':
+                                board.board[i2][j2] = Monster((j2, i2))
+                                all_sprites.add(board.board[i2][j2])
+                            if board.board[i2][j2] == 'weapon':
+                                board.board[i2][j2] = Weapon((j2, i2))
+                                all_sprites.add(board.board[i2][j2])
 
     class Heart(pygame.sprite.Sprite):
         def __init__(self):
